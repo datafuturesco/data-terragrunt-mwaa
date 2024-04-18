@@ -1,0 +1,12 @@
+*.DS_Store
+backend.tf
+aws_provider.tf
+.*.lock.hcl
+# Terraform
+.terraform
+terraform.tfvars
+*.tfstate
+*.tfstate.backup
+*.terragrunt
+*.terragrunt-cache
+terragrunt-debug.tfvars.json
