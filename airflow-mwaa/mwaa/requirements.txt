@@ -50,5 +50,5 @@ dbt-postgres==1.6.5
 dbt-snowflake==1.6.4
 
 # custom dy libraries - eventually we will refactor this module so that this will be installed at the repository/environment level.
-pysmb
-/usr/local/airflow/plugins/data_common_utils-0.2.3-py3-none-any.whl
+# pysmb
+# /usr/local/airflow/plugins/data_common_utils-0.2.3-py3-none-any.whl
