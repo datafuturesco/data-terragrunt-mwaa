@@ -73,24 +73,112 @@ variable "security_group_ids" {
 }
 
 variable "private_subnet_ids" {
-    type        = list
-    default     = []
+  type    = list
+  default = []
 }
 
 variable "min_workers" {
-    type        = number
-    default     = 1
+  type    = number
+  default = 1
 }
 variable "max_workers" {
-    type        = number
-    default     = 2
+  type    = number
+  default = 2
 }
 variable "environment_name_suffix" {
-    type        = string
-    default     = null
+  type    = string
+  default = null
 }
 variable "environment_class" {
-    type        = string
-    default     = "mw1.small"
+  type    = string
+  default = "mw1.small"
+}
+variable "mwaa_dir_env_path" {
+  type    = string
+  default = ""
+}
+variable "mwaa_dir_region_path" {
+  type    = string
+  default = ""
+}
+variable "mwaa_dir_app_path" {
+  type    = string
+  default = ""
 }
 
+variable "bucket_acl" {
+  type    = string
+  default = "private"
+}
+
+variable "bucket_object_ownership_flag" {
+  type    = bool
+  default = true
+}
+
+variable "bucket_object_ownership" {
+  type    = string
+  default = "ObjectWriter"
+}
+
+variable "mwaa_airflow_version" {
+  type    = string
+  default = "2.8.1"
+}
+
+variable "mwaa_create_s3_bucket" {
+  type    = bool
+  default = false
+}
+
+variable "mwaa_logging_dag_processing_flag" {
+  type    = bool
+  default = true
+}
+variable "mwaa_logging_dag_processing_level" {
+  type    = string
+  default = "INFO"
+}
+variable "mwaa_logging_scheduler_processing_flag" {
+  type    = bool
+  default = true
+}
+variable "mwaa_logging_scheduler_processing_level" {
+  type    = string
+  default = "INFO"
+}
+variable "mwaa_logging_scheduler_task_flag" {
+  type    = bool
+  default = true
+}
+variable "mwaa_logging_scheduler_task_level" {
+  type    = string
+  default = "INFO"
+}
+variable "mwaa_logging_scheduler_webserver_flag" {
+  type    = bool
+  default = true
+}
+variable "mwaa_logging_scheduler_webserver_level" {
+  type    = string
+  default = "INFO"
+}
+variable "mwaa_logging_scheduler_worker_flag" {
+  type    = bool
+  default = true
+}
+variable "mwaa_logging_scheduler_worker_level" {
+  type    = string
+  default = "INFO"
+}
+
+variable "mwaa_webserver_access_mode" {
+  type    = string
+  default = "PUBLIC_ONLY"
+}
+
+variable "mwaa_custom_inline_policy" {
+  type        = string
+  default     = ""
+  description = "Pass any document using the <<-EOF method."
+}

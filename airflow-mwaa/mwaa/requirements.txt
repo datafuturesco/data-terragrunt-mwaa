@@ -1,54 +1,32 @@
---constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.6.3/constraints-3.10.txt"
+#--constraint "https://raw.githubusercontent.com/apache/airflow/constraints-main/constraints-3.8.txt"
+#--constraint "https://gist.githubusercontent.com/dovy/6e30c0d603378a2cd7bffc960c4d120d/raw/99f88e6d4bcbaa061a52776219a3059051b0ef15/constraints-3.8-fixed.txt"
 
-# json-rpc==1.15.0
-
-# packaging==21.3
-# # networkx==3.1
-
-# # logbook==1.5.3
-# # agate
-
-# pyparsing==3.1.0
-# # msgpack==1.0.2
-# # parsedatetime==2.6
-# # pytimeparse==1.1.8
-# # leather==0.3.4
-# PyYAML==6.0
-
-# jsonschema==4.18.0
-# # hologram==0.0.12
-
-# psycopg2-binary==2.9.6
-
-# watchtower==2.0.1
-
-swagger-ui-bundle==0.0.9
-connexion[swagger-ui]
-
-pandas==1.5.3
+packaging==24.0
+pyparsing==3.1.2
+PyYAML==6.0.1
+jsonschema==4.21.1
+watchtower==3.2.0
+pandas==2.0.3
 numpy==1.24.4
-# python-dotenv==1.0.0
+python-dotenv==1.0.1
+pendulum==3.0.0
+s3fs==2023.12.2
+requests==2.31.0
 
-# # apache-airflow-providers-openlineage
-# apache-airflow-providers-ssh==3.7.1
-# apache-airflow-providers-snowflake==4.2.0
-# apache-airflow-providers-amazon==8.3.0
-# apache-airflow-providers-postgres==5.5.1
-# apache-airflow-providers-sftp==4.3.1
-# snowflake-connector-python==3.0.4
-# snowflake-sqlalchemy==1.4.7
-# apache-airflow-providers-cncf-kubernetes==7.1.0
+apache-airflow-providers-ssh==3.10.1
+apache-airflow-providers-snowflake==5.4.0
+snowflake-connector-python==3.9.0
+apache-airflow-providers-amazon==8.20.0
+apache-airflow-providers-sftp==4.9.1
+apache-airflow-providers-oracle==3.9.2
+apache-airflow-providers-dbt-cloud==3.7.1
+snowflake-sqlalchemy==1.5.3
+apache-airflow-providers-cncf-kubernetes==8.1.0
+apache-airflow-providers-pagerduty==3.6.2
 
-# s3fs==2023.9.2
-# requests==2.31.0
-# pysftp==0.2.9
-# minimal-snowplow-tracker==0.0.2
-# # astronomer-cosmos==1.1.3
-# XlsxWriter==3.1.6
+pysftp==0.2.9
+airflow-dbt-python[redshift,s3,snowflake]==2.0.1
 
-dbt-postgres==1.6.5
-dbt-snowflake==1.7.1
-
-# custom dy libraries - eventually we will refactor this module so that this will be installed at the repository/environment level.
-# pysmb
-# /usr/local/airflow/plugins/data_common_utils-0.2.3-py3-none-any.whl
+dbt-snowflake==1.7.3
+pysmb==1.2.9.1
+pathspec==0.11.2 # Conflicts with DBT Core

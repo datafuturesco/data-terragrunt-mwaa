@@ -18,8 +18,8 @@ data "aws_caller_identity" "current" {}
 locals {
   azs           = slice(data.aws_availability_zones.available.names, 0, 2)
   resource_name = var.environment_name_suffix == null ? format("%s-%s-%s", var.platform, var.name, var.environment) : format("%s-%s-%s-%s", var.platform, var.name, var.environment, var.environment_name_suffix)
-  
-  bucket_name   = format("%s-%s-%s",
+
+  bucket_name = format("%s-%s-%s",
     var.aws_account_id,
     var.aws_region,
     local.resource_name
@@ -34,17 +34,43 @@ locals {
       Region : var.aws_region
     }
   )
+
+  # This block is HORRIBLY ugly. It was the ONLY way to have conditional file-checks for the diff files for MWAA.
+  startup_env_path    = var.mwaa_dir_env_path != "" && fileexists("${var.mwaa_dir_env_path}/startup.sh") ? "${var.mwaa_dir_env_path}/startup.sh" : ""
+  startup_region_path = var.mwaa_dir_region_path != "" && fileexists("${var.mwaa_dir_region_path}/startup.sh") ? "${var.mwaa_dir_region_path}/startup.sh" : ""
+  startup_app_path    = var.mwaa_dir_app_path != "" && fileexists("${var.mwaa_dir_app_path}/startup.sh") ? "${var.mwaa_dir_app_path}/startup.sh" : ""
+  startup_local_path  = fileexists("mwaa/startup.sh") ? "mwaa/startup.sh" : ""
+  startup_test_1      = local.startup_app_path != "" ? local.startup_app_path : local.startup_region_path
+  startup_test_2      = local.startup_test_1 != "" ? local.startup_test_1 : local.startup_env_path
+  startup_path        = local.startup_test_2 != "" ? local.startup_test_2 : local.startup_local_path
+
+  requirements_env_path    = var.mwaa_dir_env_path != "" && fileexists("${var.mwaa_dir_env_path}/requirements.txt") ? "${var.mwaa_dir_env_path}/requirements.txt" : ""
+  requirements_region_path = var.mwaa_dir_region_path != "" && fileexists("${var.mwaa_dir_region_path}/requirements.txt") ? "${var.mwaa_dir_region_path}/requirements.txt" : ""
+  requirements_app_path    = var.mwaa_dir_app_path != "" && fileexists("${var.mwaa_dir_app_path}/requirements.txt") ? "${var.mwaa_dir_app_path}/requirements.txt" : ""
+  requirements_local_path  = fileexists("mwaa/requirements.txt") ? "mwaa/requirements.txt" : ""
+  requirements_test_1      = local.requirements_app_path != "" ? local.requirements_app_path : local.requirements_region_path
+  requirements_test_2      = local.requirements_test_1 != "" ? local.requirements_test_1 : local.requirements_env_path
+  requirements_path        = local.requirements_test_2 != "" ? local.requirements_test_2 : local.requirements_local_path
+
+  plugins_env_path    = var.mwaa_dir_env_path != "" && fileexists("${var.mwaa_dir_env_path}/plugins.zip") ? "${var.mwaa_dir_env_path}/plugins.zip" : ""
+  plugins_region_path = var.mwaa_dir_region_path != "" && fileexists("${var.mwaa_dir_region_path}/plugins.zip") ? "${var.mwaa_dir_region_path}/plugins.zip" : ""
+  plugins_app_path    = var.mwaa_dir_app_path != "" && fileexists("${var.mwaa_dir_app_path}/plugins.zip") ? "${var.mwaa_dir_app_path}/plugins.zip" : ""
+  plugins_local_path  = fileexists("mwaa/plugins.zip") ? "mwaa/plugins.zip" : ""
+  plugins_test_1      = local.plugins_app_path != "" ? local.plugins_app_path : local.plugins_region_path
+  plugins_test_2      = local.plugins_test_1 != "" ? local.plugins_test_1 : local.plugins_env_path
+  plugins_path        = local.plugins_test_2 != "" ? local.plugins_test_2 : local.plugins_local_path
+  # End HORRIBLY ugly block!
 }
 
 module "bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
   bucket = local.bucket_name
-  acl    = "private"
+  acl    = var.bucket_acl
   tags   = local.tags
 
-  control_object_ownership = true
-  object_ownership         = "ObjectWriter"
+  control_object_ownership = var.bucket_object_ownership_flag
+  object_ownership         = var.bucket_object_ownership
 
   #  versioning = {
   #    enabled = true
@@ -64,17 +90,43 @@ resource "aws_s3_object" "dags" {
   ]
 }
 
-# Upload plugins/requirements.txt
-resource "aws_s3_object" "mwaa" {
+# Upload startup.sh script.
+resource "aws_s3_object" "startup" {
   provider   = aws.airflow_mwaa
-  for_each   = fileset("mwaa/", "*")
   bucket     = module.bucket.s3_bucket_id
-  key        = each.value
-  source     = "mwaa/${each.value}"
-  etag       = filemd5("mwaa/${each.value}")
+  key        = "mwaa/startup.sh"
+  source     = local.startup_path
+  etag       = filemd5(local.startup_path)
   depends_on = [
     module.bucket
   ]
+  count = local.startup_path != "" ? 1 : 0
+}
+
+# Upload requirements.txt script.
+resource "aws_s3_object" "requirements" {
+  provider   = aws.airflow_mwaa
+  bucket     = module.bucket.s3_bucket_id
+  key        = "mwaa/requirements.txt"
+  source     = local.requirements_path
+  etag       = filemd5(local.requirements_path)
+  depends_on = [
+    module.bucket
+  ]
+  count = local.requirements_path != "" ? 1 : 0
+}
+
+# Upload plugins.zip script.
+resource "aws_s3_object" "plugins" {
+  provider   = aws.airflow_mwaa
+  bucket     = module.bucket.s3_bucket_id
+  key        = "mwaa/plugins.zip"
+  source     = local.plugins_path
+  etag       = filemd5(local.plugins_path)
+  depends_on = [
+    module.bucket
+  ]
+  count = local.plugins_path != "" ? 1 : 0
 }
 
 #-----------------------------------------------------------
@@ -85,7 +137,7 @@ module "mwaa" {
   source = "aws-ia/mwaa/aws"
 
   name              = local.resource_name
-  airflow_version   = "2.6.3"
+  airflow_version   = var.mwaa_airflow_version
   #  kms_key           = module.kms.arn
   environment_class = var.environment_class
   create_s3_bucket  = false
@@ -95,34 +147,34 @@ module "mwaa" {
   #  execution_role_arn = ""  # Arn of existing permission role.
 
   ## If uploading requirements.txt or plugins, you can enable these via these options
-  #  plugins_s3_path      = "plugins.zip"
-  requirements_s3_path   = "requirements.txt"
-  startup_script_s3_path = "startup.sh"
+  plugins_s3_path        = "mwaa/plugins.zip"
+  requirements_s3_path   = "mwaa/requirements.txt"
+  startup_script_s3_path = "mwaa/startup.sh"
 
   logging_configuration = {
     dag_processing_logs = {
-      enabled   = true
-      log_level = "INFO"
+      enabled   = var.mwaa_logging_scheduler_processing_flag
+      log_level = var.mwaa_logging_scheduler_processing_level
     }
 
     scheduler_logs = {
-      enabled   = true
-      log_level = "INFO"
+      enabled   = var.mwaa_logging_scheduler_task_flag
+      log_level = var.mwaa_logging_scheduler_task_level
     }
 
     task_logs = {
-      enabled   = true
-      log_level = "INFO"
+      enabled   = var.mwaa_logging_scheduler_task_flag
+      log_level = var.mwaa_logging_scheduler_task_level
     }
 
     webserver_logs = {
-      enabled   = true
-      log_level = "INFO"
+      enabled   = var.mwaa_logging_scheduler_webserver_flag
+      log_level = var.mwaa_logging_scheduler_webserver_level
     }
 
     worker_logs = {
-      enabled   = true
-      log_level = "INFO"
+      enabled   = var.mwaa_logging_scheduler_worker_flag
+      log_level = var.mwaa_logging_scheduler_worker_level
     }
   }
 
@@ -133,7 +185,6 @@ module "mwaa" {
     "webserver.dag_orientation"     = "TB"
   }
 
-
   min_workers = var.min_workers
   max_workers = var.max_workers
   vpc_id      = try(var.vpc_id, module.vpc.vpc_id)
@@ -142,7 +193,7 @@ module "mwaa" {
   create_security_group = var.security_group_ids == [] ? true : false
   security_group_ids    = try(var.security_group_ids, module.vpc.default_security_group_id)
 
-  webserver_access_mode = "PUBLIC_ONLY"
+  webserver_access_mode = var.mwaa_webserver_access_mode
   # Choose the Private network option(PRIVATE_ONLY) if your Apache Airflow UI is only accessed within a corporate network, and you do not require access to public repositories for web server requirements installation
   source_cidr           = var.source_cidr # Add your IP address to access Airflow UI
 
@@ -154,7 +205,6 @@ module "mwaa" {
   ]
 
 }
-
 
 #---------------------------------------------------------------
 # Supporting Resources
@@ -202,17 +252,20 @@ data "aws_iam_policy_document" "github_policy_permissions" {
   }
 }
 
+# Give the GitHub user s3 access.
 resource "aws_iam_user_policy" "lb_ro" {
   name   = "mwaa-s3-access"
   user   = aws_iam_user.github_user.id
   policy = data.aws_iam_policy_document.github_policy_permissions.json
+  depends_on = [
+    aws_iam_user.github_user
+  ]
 }
 
-# Give Airflow Glue Permissions
+# Give Airflow Glue Permissions.
 resource "aws_iam_role_policy" "getgluejob" {
-  name = "GluePermissions"
-  role = module.mwaa.mwaa_role_name
-
+  name   = "GluePermissions"
+  role   = module.mwaa.mwaa_role_name
   policy = <<EOT
 {
   "Version": "2012-10-17",
@@ -231,11 +284,18 @@ resource "aws_iam_role_policy" "getgluejob" {
         "iam:GetRole"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:iam::966612968161:role/dwprod01-glue-job-role"
+      "Resource": "${module.mwaa.mwaa_role_arn}"
     }
   ]
-
 }
 EOT
+}
 
+# Custom Inline Policy, any JSON can be passed. Use {{MWAA_ROLE_ARN}} to denote the arn being used by MWAA.
+resource "aws_iam_role_policy" "custom_inline_policy" {
+  name = "CustomInlinePolicy"
+  role = module.mwaa.mwaa_role_name
+
+  policy = var.mwaa_custom_inline_policy
+  count  = var.mwaa_custom_inline_policy != "" ? 1 : 0
 }

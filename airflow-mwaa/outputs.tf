@@ -22,10 +22,17 @@ output "mwaa_role_arn" {
   description = "The ARN of the MWAA Environment role."
   value       = module.mwaa.mwaa_role_arn
 }
+
+output "mwaa_role_name" {
+  description = "The role name of the MWAA Environment role."
+  value       = module.mwaa.mwaa_role_name
+}
+
 output "mwaa_security_group_id" {
   description = "The ARN of the MWAA Environment secruity group."
   value       = module.mwaa.mwaa_security_group_id
 }
+
 output "github_user_id" {
   value = aws_iam_user.github_user.id
 }
