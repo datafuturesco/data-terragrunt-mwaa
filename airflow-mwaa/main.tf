@@ -52,13 +52,13 @@ locals {
   requirements_test_2      = local.requirements_test_1 != "" ? local.requirements_test_1 : local.requirements_env_path
   requirements_path        = local.requirements_test_2 != "" ? local.requirements_test_2 : local.requirements_local_path
 
-  plugins_env_path    = var.mwaa_dir_env_path != "" && fileexists("${var.mwaa_dir_env_path}/plugins.zip") ? "${var.mwaa_dir_env_path}/plugins.zip" : ""
-  plugins_region_path = var.mwaa_dir_region_path != "" && fileexists("${var.mwaa_dir_region_path}/plugins.zip") ? "${var.mwaa_dir_region_path}/plugins.zip" : ""
-  plugins_app_path    = var.mwaa_dir_app_path != "" && fileexists("${var.mwaa_dir_app_path}/plugins.zip") ? "${var.mwaa_dir_app_path}/plugins.zip" : ""
-  plugins_local_path  = fileexists("mwaa/plugins.zip") ? "mwaa/plugins.zip" : ""
-  plugins_test_1      = local.plugins_app_path != "" ? local.plugins_app_path : local.plugins_region_path
-  plugins_test_2      = local.plugins_test_1 != "" ? local.plugins_test_1 : local.plugins_env_path
-  plugins_path        = local.plugins_test_2 != "" ? local.plugins_test_2 : local.plugins_local_path
+  #plugins_env_path    = var.mwaa_dir_env_path != "" && fileexists("${var.mwaa_dir_env_path}/plugins.zip") ? "${var.mwaa_dir_env_path}/plugins.zip" : ""
+  #plugins_region_path = var.mwaa_dir_region_path != "" && fileexists("${var.mwaa_dir_region_path}/plugins.zip") ? "${var.mwaa_dir_region_path}/plugins.zip" : ""
+  #plugins_app_path    = var.mwaa_dir_app_path != "" && fileexists("${var.mwaa_dir_app_path}/plugins.zip") ? "${var.mwaa_dir_app_path}/plugins.zip" : ""
+  #plugins_local_path  = fileexists("mwaa/plugins.zip") ? "mwaa/plugins.zip" : ""
+  #plugins_test_1      = local.plugins_app_path != "" ? local.plugins_app_path : local.plugins_region_path
+  #plugins_test_2      = local.plugins_test_1 != "" ? local.plugins_test_1 : local.plugins_env_path
+  #plugins_path        = local.plugins_test_2 != "" ? local.plugins_test_2 : local.plugins_local_path
   # End HORRIBLY ugly block!
 }
 
