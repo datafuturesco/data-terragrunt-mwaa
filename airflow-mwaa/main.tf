@@ -117,17 +117,17 @@ resource "aws_s3_object" "requirements" {
 }
 
 # Upload plugins.zip script.
-resource "aws_s3_object" "plugins" {
-  provider   = aws.airflow_mwaa
-  bucket     = module.bucket.s3_bucket_id
-  key        = "mwaa/plugins.zip"
-  source     = local.plugins_path
-  etag       = filemd5(local.plugins_path)
-  depends_on = [
-    module.bucket
-  ]
-  count = local.plugins_path != "" ? 1 : 0
-}
+#resource "aws_s3_object" "plugins" {
+#  provider   = aws.airflow_mwaa
+#  bucket     = module.bucket.s3_bucket_id
+#  key        = "mwaa/plugins.zip"
+#  source     = local.plugins_path
+#  etag       = filemd5(local.plugins_path)
+#  depends_on = [
+#    module.bucket
+#  ]
+#  count = local.plugins_path != "" ? 1 : 0
+#}
 
 #-----------------------------------------------------------
 # NOTE: MWAA Airflow environment takes minimum of 20 mins
@@ -147,7 +147,7 @@ module "mwaa" {
   #  execution_role_arn = ""  # Arn of existing permission role.
 
   ## If uploading requirements.txt or plugins, you can enable these via these options
-  plugins_s3_path        = "mwaa/plugins.zip"
+  #plugins_s3_path        = "mwaa/plugins.zip"
   requirements_s3_path   = "mwaa/requirements.txt"
   startup_script_s3_path = "mwaa/startup.sh"
 
