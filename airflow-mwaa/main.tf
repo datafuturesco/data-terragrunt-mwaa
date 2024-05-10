@@ -142,7 +142,7 @@ module "mwaa" {
   create_security_group = var.security_group_ids == [] ? true : false
   security_group_ids    = try(var.security_group_ids, module.vpc.default_security_group_id)
 
-  webserver_access_mode = "PRIVATE_ONLY"
+  webserver_access_mode = "PUBLIC_ONLY"
   # Choose the Private network option(PRIVATE_ONLY) if your Apache Airflow UI is only accessed within a corporate network, and you do not require access to public repositories for web server requirements installation
   source_cidr           = var.source_cidr # Add your IP address to access Airflow UI
 
