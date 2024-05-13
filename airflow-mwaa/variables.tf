@@ -174,7 +174,7 @@ variable "mwaa_logging_scheduler_worker_level" {
 
 variable "mwaa_webserver_access_mode" {
   type    = string
-  default = "PUBLIC_ONLY"
+  default = "PRIVATE_ONLY"
 }
 
 variable "mwaa_custom_inline_policy" {
