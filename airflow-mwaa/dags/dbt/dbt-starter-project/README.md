@@ -1,15 +1,20 @@
-Welcome to your new dbt project!
+## Configure DBT
 
-### Using the starter project
+You can place any DBT files in here. You will need to alter a few files to ensure the default values match your needs.
 
-Try running the following commands:
-- dbt run
-- dbt test
+### dbt_project.yml 
 
+##### `name` argument
+You will need to alter the `[PROJECT]` value with your project name. Please note, `-`'s and `spaces` will not work. Please use underscores.
 
-### Resources:
-- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
-- Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
-- Join the [dbt community](https://getdbt.com/community) to learn from other analytics engineers
-- Find [dbt events](https://events.getdbt.com) near you
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
+##### `models` argument
+This will also have to be modified under the `models:` argument as the first referenced point is the profile name.
+
+##### `+database` argument
+Lastly, you will want to change the `+database:` key to match your project.
+
+### profiles.yml
+
+This file defines the defaults for all variables. The only real key that needs modifying is the `database` key.
+
+> Please note the `database` key is  referenced a few times. Be sure to update all references!
