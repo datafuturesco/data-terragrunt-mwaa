@@ -1,5 +1,5 @@
 WITH raw_listings AS (
-    SELECT * FROM TEST.RAW.raw_listings
+    SELECT * FROM {{source('airflow','listings')}}
 )
 SELECT 
     id AS listing_id,

@@ -1,12 +1,8 @@
 
-  create or replace   view TEST.DEV.dim_listings_cleansed
-  
-   as (
-    
 
 WITH  __dbt__cte__src_listings as (
 WITH raw_listings AS (
-    SELECT * FROM TEST.raw.raw_listings
+    SELECT * FROM AIRFLOW.raw.raw_listings
 )
 SELECT 
     id AS listing_id,
@@ -38,5 +34,3 @@ SELECT
     updated_at
 FROM
     src_listings
-  );
-

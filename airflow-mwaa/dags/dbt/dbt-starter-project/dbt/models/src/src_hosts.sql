@@ -1,5 +1,5 @@
 WITH raw_hosts AS (
-    SELECT * FROM TEST.RAW.raw_hosts
+    SELECT * FROM {{source('airflow','hosts')}}
 )
 SELECT 
     id AS host_id,

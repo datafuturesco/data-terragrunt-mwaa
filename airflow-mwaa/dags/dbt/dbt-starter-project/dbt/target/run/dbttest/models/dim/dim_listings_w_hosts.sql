@@ -2,13 +2,13 @@
   
     
 
-        create or replace transient table TEST.DEV.dim_listings_w_hosts
+        create or replace transient table AIRFLOW.DEV.dim_listings_w_hosts
          as
         (WITH l AS (
-    SELECT * FROM TEST.DEV.dim_listings_cleansed
+    SELECT * FROM AIRFLOW.DEV.dim_listings_cleansed
 ), 
 h AS (
-    SELECT * FROM TEST.DEV.dim_hosts_cleansed
+    SELECT * FROM AIRFLOW.DEV.dim_hosts_cleansed
 )
 
 SELECT 

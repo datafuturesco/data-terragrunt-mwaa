@@ -31,4 +31,7 @@ clean-targets: # directories to be removed by `dbt clean`
 models:
   mwaatest:
     +materialized: view
-
+    src:
+      +materialized: ephemeral
+    dim:
+      +materialized: table

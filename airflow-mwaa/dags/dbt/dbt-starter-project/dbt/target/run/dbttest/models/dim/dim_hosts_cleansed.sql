@@ -1,12 +1,12 @@
 
-  create or replace   view TEST.DEV.dim_hosts_cleansed
+  create or replace   view AIRFLOW.DEV.dim_hosts_cleansed
   
    as (
     
 
 WITH  __dbt__cte__src_hosts as (
 WITH raw_hosts AS (
-    SELECT * FROM TEST.raw.raw_hosts
+    SELECT * FROM AIRFLOW.raw.raw_hosts
 )
 SELECT 
     id AS host_id,

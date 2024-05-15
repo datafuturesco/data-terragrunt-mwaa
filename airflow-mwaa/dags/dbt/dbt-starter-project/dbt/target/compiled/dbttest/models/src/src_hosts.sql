@@ -1,5 +1,5 @@
 WITH raw_hosts AS (
-    SELECT * FROM TEST.raw.raw_hosts
+    SELECT * FROM AIRFLOW.raw.raw_hosts
 )
 SELECT 
     id AS host_id,

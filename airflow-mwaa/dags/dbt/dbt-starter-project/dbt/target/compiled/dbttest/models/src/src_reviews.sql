@@ -1,5 +1,5 @@
 WITH raw_reviews AS(
-    SELECT * FROM TEST.raw.raw_reviews
+    SELECT * FROM AIRFLOW.raw.raw_reviews
 )
 SELECT 
     listing_id,

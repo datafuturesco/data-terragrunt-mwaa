@@ -1,5 +1,9 @@
-WITH raw_listings AS (
-    SELECT * FROM TEST.raw.raw_listings
+
+  create or replace   view AIRFLOW.DEV.src_listings
+  
+   as (
+    WITH raw_listings AS (
+    SELECT * FROM AIRFLOW.raw.raw_listings
 )
 SELECT 
     id AS listing_id,
@@ -13,3 +17,5 @@ SELECT
     updated_at
 FROM
     raw_listings
+  );
+
