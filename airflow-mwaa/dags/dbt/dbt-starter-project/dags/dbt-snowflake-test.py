@@ -61,7 +61,12 @@ with DAG(
         concurrency=3, 
         max_active_runs=1,
 ) as dag:
-
+    with TaskGroup(group_id='bash_task') as bash_task:
+        bash_check = BashOperator(
+            task_id='bash_check',
+            bash_command='echo "Current Working Directory: $(pwd)" && cd /usr/local/airflow/dags/dbdata && echo "Current Working Directory: $(pwd)" '
+        )
+        
     with TaskGroup(group_id='dbt_task') as dbt_task:
         dbt_run = BashOperator(
             task_id="dbt_run",
@@ -75,6 +80,8 @@ with DAG(
         )
         
         dbt_run
-
+        
+    bash_task >> dbt_task
+    
 if __name__ == "__main__":
     dag.cli()
