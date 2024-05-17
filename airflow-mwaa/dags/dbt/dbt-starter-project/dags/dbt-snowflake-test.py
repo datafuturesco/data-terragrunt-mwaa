@@ -54,7 +54,7 @@ print('env_vars', env_vars)
 
 with DAG(
         dag_id=DAG_ID,
-        description="Run the {dir_path} DBT code.",
+        description="Run the DBT code.",
         start_date= datetime(2024,5,15, tzinfo=local_tz),  # Start date of the DAG
         schedule_interval = "25 7 * * *",
         catchup=False,
