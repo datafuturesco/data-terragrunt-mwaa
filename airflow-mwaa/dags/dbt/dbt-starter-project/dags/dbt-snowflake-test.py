@@ -64,7 +64,8 @@ with DAG(
     with TaskGroup(group_id='bash_task') as bash_task:
         bash_check = BashOperator(
             task_id='bash_check',
-            bash_command='echo "Current Working Directory: $(pwd)" && cd /usr/local/airflow/dags/dbdata && echo "Current Working Directory: $(pwd)" '
+            bash_command=f'echo "Current Working Directory: $(pwd)"'
+            +f'&& cd {dbt_path} && echo "Current Working Directory: $(pwd)" '
         )
         
     with TaskGroup(group_id='dbt_task') as dbt_task:
