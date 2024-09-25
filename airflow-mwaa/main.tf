@@ -52,13 +52,13 @@ locals {
   requirements_test_2      = local.requirements_test_1 != "" ? local.requirements_test_1 : local.requirements_env_path
   requirements_path        = local.requirements_test_2 != "" ? local.requirements_test_2 : local.requirements_local_path
 
-  #plugins_env_path    = var.mwaa_dir_env_path != "" && fileexists("${var.mwaa_dir_env_path}/plugins.zip") ? "${var.mwaa_dir_env_path}/plugins.zip" : ""
-  #plugins_region_path = var.mwaa_dir_region_path != "" && fileexists("${var.mwaa_dir_region_path}/plugins.zip") ? "${var.mwaa_dir_region_path}/plugins.zip" : ""
-  #plugins_app_path    = var.mwaa_dir_app_path != "" && fileexists("${var.mwaa_dir_app_path}/plugins.zip") ? "${var.mwaa_dir_app_path}/plugins.zip" : ""
-  #plugins_local_path  = fileexists("mwaa/plugins.zip") ? "mwaa/plugins.zip" : ""
-  #plugins_test_1      = local.plugins_app_path != "" ? local.plugins_app_path : local.plugins_region_path
-  #plugins_test_2      = local.plugins_test_1 != "" ? local.plugins_test_1 : local.plugins_env_path
-  #plugins_path        = local.plugins_test_2 != "" ? local.plugins_test_2 : local.plugins_local_path
+  plugins_env_path    = var.mwaa_dir_env_path != "" && fileexists("${var.mwaa_dir_env_path}/plugins.zip") ? "${var.mwaa_dir_env_path}/plugins.zip" : ""
+  plugins_region_path = var.mwaa_dir_region_path != "" && fileexists("${var.mwaa_dir_region_path}/plugins.zip") ? "${var.mwaa_dir_region_path}/plugins.zip" : ""
+  plugins_app_path    = var.mwaa_dir_app_path != "" && fileexists("${var.mwaa_dir_app_path}/plugins.zip") ? "${var.mwaa_dir_app_path}/plugins.zip" : ""
+  plugins_local_path  = fileexists("mwaa/plugins.zip") ? "mwaa/plugins.zip" : ""
+  plugins_test_1      = local.plugins_app_path != "" ? local.plugins_app_path : local.plugins_region_path
+  plugins_test_2      = local.plugins_test_1 != "" ? local.plugins_test_1 : local.plugins_env_path
+  plugins_path        = local.plugins_test_2 != "" ? local.plugins_test_2 : local.plugins_local_path
   # End HORRIBLY ugly block!
 }
 
@@ -79,12 +79,12 @@ module "bucket" {
 
 # Upload DAGS
 resource "aws_s3_object" "dags" {
-  provider   = aws.airflow_mwaa
-  for_each   = fileset("dags/", "**")
-  bucket     = module.bucket.s3_bucket_id
-  key        = "dags/${each.value}"
-  source     = "dags/${each.value}"
-  etag       = filemd5("dags/${each.value}")
+  provider = aws.airflow_mwaa
+  for_each = fileset("dags/", "**")
+  bucket   = module.bucket.s3_bucket_id
+  key      = "dags/${each.value}"
+  source   = "dags/${each.value}"
+  etag     = filemd5("dags/${each.value}")
   depends_on = [
     module.bucket
   ]
@@ -92,11 +92,11 @@ resource "aws_s3_object" "dags" {
 
 # Upload startup.sh script.
 resource "aws_s3_object" "startup" {
-  provider   = aws.airflow_mwaa
-  bucket     = module.bucket.s3_bucket_id
-  key        = "mwaa/startup.sh"
-  source     = local.startup_path
-  etag       = filemd5(local.startup_path)
+  provider = aws.airflow_mwaa
+  bucket   = module.bucket.s3_bucket_id
+  key      = "mwaa/startup.sh"
+  source   = local.startup_path
+  etag     = filemd5(local.startup_path)
   depends_on = [
     module.bucket
   ]
@@ -105,11 +105,11 @@ resource "aws_s3_object" "startup" {
 
 # Upload requirements.txt script.
 resource "aws_s3_object" "requirements" {
-  provider   = aws.airflow_mwaa
-  bucket     = module.bucket.s3_bucket_id
-  key        = "mwaa/requirements.txt"
-  source     = local.requirements_path
-  etag       = filemd5(local.requirements_path)
+  provider = aws.airflow_mwaa
+  bucket   = module.bucket.s3_bucket_id
+  key      = "mwaa/requirements.txt"
+  source   = local.requirements_path
+  etag     = filemd5(local.requirements_path)
   depends_on = [
     module.bucket
   ]
@@ -117,17 +117,17 @@ resource "aws_s3_object" "requirements" {
 }
 
 # Upload plugins.zip script.
-#resource "aws_s3_object" "plugins" {
-#  provider   = aws.airflow_mwaa
-#  bucket     = module.bucket.s3_bucket_id
-#  key        = "mwaa/plugins.zip"
-#  source     = local.plugins_path
-#  etag       = filemd5(local.plugins_path)
-#  depends_on = [
-#    module.bucket
-#  ]
-#  count = local.plugins_path != "" ? 1 : 0
-#}
+resource "aws_s3_object" "plugins" {
+  provider = aws.airflow_mwaa
+  bucket   = module.bucket.s3_bucket_id
+  key      = "mwaa/plugins.zip"
+  source   = local.plugins_path
+  etag     = filemd5(local.plugins_path)
+  depends_on = [
+    module.bucket
+  ]
+  count = local.plugins_path != "" ? 1 : 0
+}
 
 #-----------------------------------------------------------
 # NOTE: MWAA Airflow environment takes minimum of 20 mins
@@ -136,8 +136,8 @@ module "mwaa" {
 
   source = "aws-ia/mwaa/aws"
 
-  name              = local.resource_name
-  airflow_version   = var.mwaa_airflow_version
+  name            = local.resource_name
+  airflow_version = var.mwaa_airflow_version
   #  kms_key           = module.kms.arn
   environment_class = var.environment_class
   create_s3_bucket  = false
@@ -147,7 +147,7 @@ module "mwaa" {
   #  execution_role_arn = ""  # Arn of existing permission role.
 
   ## If uploading requirements.txt or plugins, you can enable these via these options
-  #plugins_s3_path        = "mwaa/plugins.zip"
+  plugins_s3_path        = "mwaa/plugins.zip"
   requirements_s3_path   = "mwaa/requirements.txt"
   startup_script_s3_path = "mwaa/startup.sh"
 
@@ -195,7 +195,7 @@ module "mwaa" {
 
   webserver_access_mode = var.mwaa_webserver_access_mode
   # Choose the Private network option(PRIVATE_ONLY) if your Apache Airflow UI is only accessed within a corporate network, and you do not require access to public repositories for web server requirements installation
-  source_cidr           = var.source_cidr # Add your IP address to access Airflow UI
+  source_cidr = var.source_cidr # Add your IP address to access Airflow UI
 
   tags = local.tags
 
@@ -241,13 +241,17 @@ resource "aws_iam_user" "github_user" {
 
 data "aws_iam_policy_document" "github_policy_permissions" {
   statement {
-    effect  = "Allow"
+    effect = "Allow"
     actions = [
-      "s3:*"
+      "s3:*",
+      "sns:*",
+      "sqs:*"
     ]
     resources = [
       module.bucket.s3_bucket_arn,
-      "${module.bucket.s3_bucket_arn}/*"
+      "${module.bucket.s3_bucket_arn}/*",
+      "arn:aws:sns:*:*:*",
+      "arn:aws:sqs:*:*:*"
     ]
   }
 }
